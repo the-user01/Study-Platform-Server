@@ -10,6 +10,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "https://study-platform-c102f.web.app"
     ]
   })
 );
