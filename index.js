@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 
 app.use(
@@ -34,30 +34,57 @@ async function run() {
 
     const usersCollection = client.db("studyPlatformDb").collection("users");
 
+
+    // jwt related api
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1hr' })
+      res.send({ token });
+    })
+
+
+    // middlewares
+    const verifyToken = (req, res, next) => {
+      if (!req.headers.authorization) {
+        return res.status(401).send({ message: 'unauthorized access' })
+      }
+      const token = req.headers.authorization.split(' ')[1];
+
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+        if (error) {
+          return res.status(401).send({ message: 'unauthorized access' })
+        }
+        req.decoded = decoded;
+        next();
+      })
+    }
+
+
+
     // users related api
 
-    app.get('/users', async(req, res)=>{
+    app.get('/users', verifyToken, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result)
     })
 
 
-    app.post("/users", async(req, res)=>{
+    app.post("/users", async (req, res) => {
       const user = req.body;
       // insert email if user doesn't exist
-      const query = {email: user.email}
+      const query = { email: user.email }
       const existingUser = await usersCollection.findOne(query);
-      if(existingUser){
-        return res.send({message: 'user already exist'});
+      if (existingUser) {
+        return res.send({ message: 'user already exist' });
       }
 
       const result = await usersCollection.insertOne(user);
       res.send(result)
     })
 
-    app.delete('/users/:id', async(req, res)=>{
+    app.delete('/users/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
       res.send(result);
     })
