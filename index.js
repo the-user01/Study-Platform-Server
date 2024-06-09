@@ -32,7 +32,21 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
+    const usersCollection = client.db("studyPlatformDb").collection("users");
 
+    // users related api
+    app.post("/users", async(req, res)=>{
+      const user = req.body;
+      // insert email if user doesn't exist
+      const query = {email: user.email}
+      const existingUser = await usersCollection.findOne(query);
+      if(existingUser){
+        return res.send({message: 'user already exist'});
+      }
+
+      const result = await usersCollection.insertOne(user);
+      res.send(result)
+    })
 
 
 
