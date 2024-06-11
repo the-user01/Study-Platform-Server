@@ -177,7 +177,12 @@ async function run() {
 
     // Crete Study relatted api
 
-    app.post("/create-session", async (req, res) => {
+    app.get("/create-session", verifyToken, async (req, res) => {
+      const result = await createStudyCollection.find().toArray();
+      res.send(result)
+    })
+
+    app.post("/create-session", verifyToken, verifyTutor, async (req, res) => {
       const session = req.body;
       const result = await createStudyCollection.insertOne(session);
       res.send(result)
