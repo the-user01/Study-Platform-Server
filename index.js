@@ -73,6 +73,30 @@ async function run() {
       next();
     }
 
+    const verifyTutor = async(req, res, next)=>{
+      const email = req.decoded.email;
+      const query = {email:email}
+      const user = await usersCollection.findOne(query)
+
+      const isTutor = user?.role === 'Teacher'
+      if(!isTutor){
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      next();
+    }
+
+    const verifyStudent = async(req, res, next)=>{
+      const email = req.decoded.email;
+      const query = {email:email}
+      const user = await usersCollection.findOne(query)
+
+      const isStudent = user?.role === 'Student'
+      if(!isStudent){
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      next();
+    }
+
 
 
     // users related api
@@ -82,6 +106,7 @@ async function run() {
       res.send(result)
     })
 
+    // get admin
     app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
@@ -94,6 +119,21 @@ async function run() {
         admin = user?.role === 'Admin'
       }
       res.send({ admin })
+    })
+
+    // get tutor
+    app.get('/users/tutor/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      const query = { email: email }
+      const user = await usersCollection.findOne(query)
+      let tutor = false;
+      if (user) {
+        tutor = user?.role === 'Teacher'
+      }
+      res.send({ tutor })
     })
 
 
