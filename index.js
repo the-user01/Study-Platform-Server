@@ -34,7 +34,7 @@ async function run() {
   try {
 
     const usersCollection = client.db("studyPlatformDb").collection("users");
-    const createStudyCollection = client.db("studyPlatformDb").collection("users");
+    const createStudyCollection = client.db("studyPlatformDb").collection("studyCollection");
 
 
     // jwt related api
@@ -179,7 +179,7 @@ async function run() {
 
     app.post("/create-session", async (req, res) => {
       const session = req.body;
-      const result = await usersCollection.insertOne(session);
+      const result = await createStudyCollection.insertOne(session);
       res.send(result)
     })
 
