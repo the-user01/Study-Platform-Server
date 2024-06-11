@@ -61,37 +61,37 @@ async function run() {
     }
 
 
-    const verifyAdmin = async(req, res, next)=>{
+    const verifyAdmin = async (req, res, next) => {
       const email = req.decoded.email;
-      const query = {email:email}
+      const query = { email: email }
       const user = await usersCollection.findOne(query)
 
       const isAdmin = user?.role === 'Admin'
-      if(!isAdmin){
+      if (!isAdmin) {
         return res.status(403).send({ message: 'forbidden access' })
       }
       next();
     }
 
-    const verifyTutor = async(req, res, next)=>{
+    const verifyTutor = async (req, res, next) => {
       const email = req.decoded.email;
-      const query = {email:email}
+      const query = { email: email }
       const user = await usersCollection.findOne(query)
 
       const isTutor = user?.role === 'Teacher'
-      if(!isTutor){
+      if (!isTutor) {
         return res.status(403).send({ message: 'forbidden access' })
       }
       next();
     }
 
-    const verifyStudent = async(req, res, next)=>{
+    const verifyStudent = async (req, res, next) => {
       const email = req.decoded.email;
-      const query = {email:email}
+      const query = { email: email }
       const user = await usersCollection.findOne(query)
 
       const isStudent = user?.role === 'Student'
-      if(!isStudent){
+      if (!isStudent) {
         return res.status(403).send({ message: 'forbidden access' })
       }
       next();
@@ -134,6 +134,21 @@ async function run() {
         tutor = user?.role === 'Teacher'
       }
       res.send({ tutor })
+    })
+
+    //get Student
+    app.get('/users/student/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+      const query = { email: email }
+      const user = await usersCollection.findOne(query)
+      let student = false;
+      if (user) {
+        student = user?.role === 'Student'
+      }
+      res.send({ student })
     })
 
 
