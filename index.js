@@ -34,6 +34,7 @@ async function run() {
   try {
 
     const usersCollection = client.db("studyPlatformDb").collection("users");
+    const createStudyCollection = client.db("studyPlatformDb").collection("users");
 
 
     // jwt related api
@@ -170,6 +171,16 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
       res.send(result);
+    })
+
+
+
+    // Crete Study relatted api
+
+    app.post("/create-session", async (req, res) => {
+      const session = req.body;
+      const result = await usersCollection.insertOne(session);
+      res.send(result)
     })
 
 
