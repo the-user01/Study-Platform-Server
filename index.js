@@ -195,6 +195,16 @@ async function run() {
       res.send(result)
     })
 
+    // getting data by id which are approved
+    app.get("/create-session/approved/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+
+      const query = {_id: new ObjectId(id), status: "approved" };
+
+      const result = await createStudyCollection.findOne(query);
+      res.send(result)
+    })
+
     // getting data which are rejected
     app.get("/create-session/rejected", verifyToken, async (req, res) => {
       const result = await createStudyCollection.find({status: "rejected"}).toArray();
