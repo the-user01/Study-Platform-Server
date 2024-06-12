@@ -196,7 +196,7 @@ async function run() {
     })
 
     // session status update to reject
-    app.patch("/create-session/reject/:id", async(req, res)=>{
+    app.patch("/create-session/reject/:id", verifyToken, verifyAdmin, async(req, res)=>{
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
 
