@@ -208,6 +208,22 @@ async function run() {
       res.send(result)
     })
 
+    // session status update to pending
+    app.patch("/create-session/pending/:id", verifyToken, verifyTutor, async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+
+      const updatedStatus = {
+        $set: {
+          status: "pending",
+        }
+      }
+
+      const result = await createStudyCollection.updateOne(filter, updatedStatus);
+      res.send(result);
+    })
+
+
     // session status update to reject
     app.patch("/create-session/reject/:id", verifyToken, verifyAdmin, async(req, res)=>{
       const id = req.params.id;
