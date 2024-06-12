@@ -195,6 +195,12 @@ async function run() {
       res.send(result)
     })
 
+    // getting data which are rejected
+    app.get("/create-session/rejected", verifyToken, async (req, res) => {
+      const result = await createStudyCollection.find({status: "rejected"}).toArray();
+      res.send(result)
+    })
+
     // uploading data to database
     app.post("/create-session", verifyToken, verifyTutor, async (req, res) => {
       const session = req.body;
@@ -207,9 +213,13 @@ async function run() {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
 
+      const getInfo = req.body;
+
       const updatedStatus = {
         $set: {
-          status: "rejected"
+          status: "rejected",
+          rejectionReason: getInfo.rejectionReason,
+          feedback: getInfo.feedback
         }
       }
 
