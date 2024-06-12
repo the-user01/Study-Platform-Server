@@ -189,6 +189,13 @@ async function run() {
       res.send(result)
     })
 
+    // getting data which are approved
+    app.get("/create-session/approved", verifyToken, async (req, res) => {
+      const result = await createStudyCollection.find({status: "approved"}).toArray();
+      res.send(result)
+    })
+
+    // uploading data to database
     app.post("/create-session", verifyToken, verifyTutor, async (req, res) => {
       const session = req.body;
       const result = await createStudyCollection.insertOne(session);
