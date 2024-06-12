@@ -211,6 +211,25 @@ async function run() {
     })
 
 
+    // session status update to approve and the amount
+    app.patch("/create-session/approve/:id", verifyToken, verifyAdmin, async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+
+      const updatedStatus = req.body;
+
+      const newUpdatedStatus = {
+        $set: {
+          status: "approved",
+          regFee: updatedStatus.regFee
+        }
+      }
+
+      const result = await createStudyCollection.updateOne(filter, newUpdatedStatus);
+      res.send(result);
+    })
+
+
 
 
     // Send a ping to confirm a successful connection
