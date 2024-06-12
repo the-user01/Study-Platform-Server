@@ -177,8 +177,15 @@ async function run() {
 
     // Crete Study relatted api
 
+    // getting all data 
     app.get("/create-session", verifyToken, async (req, res) => {
       const result = await createStudyCollection.find().toArray();
+      res.send(result)
+    })
+
+    // getting data which are pending
+    app.get("/create-session/pending", verifyToken, async (req, res) => {
+      const result = await createStudyCollection.find({status: "pending"}).toArray();
       res.send(result)
     })
 
@@ -188,7 +195,20 @@ async function run() {
       res.send(result)
     })
 
+    // session status update to reject
+    app.patch("/create-session/reject/:id", async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
 
+      const updatedStatus = {
+        $set: {
+          status: "rejected"
+        }
+      }
+
+      const result = await createStudyCollection.updateOne(filter, updatedStatus);
+      res.send(result);
+    })
 
 
 
