@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
@@ -39,6 +40,8 @@ async function run() {
     const materialCollection = client.db("studyPlatformDb").collection("materialCollection");
 
     const noteCollection = client.db("studyPlatformDb").collection("noteCollection");
+
+    const bookedSessionCollection = client.db("studyPlatformDb").collection("bookedSessionCollection");
 
 
     // jwt related api
@@ -194,7 +197,7 @@ async function run() {
     })
 
     // getting data which are approved
-    app.get("/create-session/approved",  async (req, res) => {
+    app.get("/create-session/approved", async (req, res) => {
       const result = await createStudyCollection.find({ status: "approved" }).toArray();
       res.send(result)
     })
@@ -312,6 +315,51 @@ async function run() {
       res.send(result)
     })
 
+
+
+    // session booked related api
+
+    // get booked session
+    app.get("/booked-session", verifyToken, verifyStudent, async (req, res) => {
+      const result = await bookedSessionCollection.find().toArray();
+      res.send(result)
+    })
+
+    // get booked session by id
+    app.get("/booked-session/:id", verifyToken, verifyStudent, async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+
+      const result = await bookedSessionCollection.findOne(query);
+      res.send(result)
+    })
+
+    // booked session post
+    app.post("/booked-session", verifyToken, verifyStudent, async (req, res) => {
+      const sessionInfo = req.body;
+      const result = await bookedSessionCollection.insertOne(sessionInfo);
+      res.send(result)
+    })
+
+
+
+    // payment related api
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
+      const { price } = req.body;
+
+      const amount = parseInt(price * 100);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'bdt',
+        payment_method_types: ['card']
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      })
+
+    })
 
 
 
