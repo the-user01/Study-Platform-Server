@@ -34,8 +34,11 @@ async function run() {
   try {
 
     const usersCollection = client.db("studyPlatformDb").collection("users");
+
     const createStudyCollection = client.db("studyPlatformDb").collection("studyCollection");
     const materialCollection = client.db("studyPlatformDb").collection("materialCollection");
+
+    const noteCollection = client.db("studyPlatformDb").collection("noteCollection");
 
 
     // jwt related api
@@ -289,6 +292,23 @@ async function run() {
     app.post("/study-material", verifyToken, verifyTutor, async (req, res) => {
       const material = req.body;
       const result = await materialCollection.insertOne(material);
+      res.send(result)
+    })
+
+
+
+    // notes related api
+
+    // get notes
+    app.get("/notes", verifyToken, verifyStudent, async (req, res) => {
+      const result = await noteCollection.find().toArray();
+      res.send(result)
+    })
+
+    // upload notes
+    app.post("/notes", verifyToken, verifyStudent, async (req, res) => {
+      const noteInfo = req.body;
+      const result = await noteCollection.insertOne(noteInfo);
       res.send(result)
     })
 
