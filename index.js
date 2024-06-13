@@ -35,6 +35,7 @@ async function run() {
 
     const usersCollection = client.db("studyPlatformDb").collection("users");
     const createStudyCollection = client.db("studyPlatformDb").collection("studyCollection");
+    const materialCollection = client.db("studyPlatformDb").collection("materialCollection");
 
 
     // jwt related api
@@ -185,13 +186,13 @@ async function run() {
 
     // getting data which are pending
     app.get("/create-session/pending", verifyToken, async (req, res) => {
-      const result = await createStudyCollection.find({status: "pending"}).toArray();
+      const result = await createStudyCollection.find({ status: "pending" }).toArray();
       res.send(result)
     })
 
     // getting data which are approved
     app.get("/create-session/approved", verifyToken, async (req, res) => {
-      const result = await createStudyCollection.find({status: "approved"}).toArray();
+      const result = await createStudyCollection.find({ status: "approved" }).toArray();
       res.send(result)
     })
 
@@ -199,7 +200,7 @@ async function run() {
     app.get("/create-session/approved/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
 
-      const query = {_id: new ObjectId(id), status: "approved" };
+      const query = { _id: new ObjectId(id), status: "approved" };
 
       const result = await createStudyCollection.findOne(query);
       res.send(result)
@@ -207,9 +208,10 @@ async function run() {
 
     // getting data which are rejected
     app.get("/create-session/rejected", verifyToken, async (req, res) => {
-      const result = await createStudyCollection.find({status: "rejected"}).toArray();
+      const result = await createStudyCollection.find({ status: "rejected" }).toArray();
       res.send(result)
     })
+
 
     // uploading data to database
     app.post("/create-session", verifyToken, verifyTutor, async (req, res) => {
@@ -219,9 +221,9 @@ async function run() {
     })
 
     // session status update to pending
-    app.patch("/create-session/pending/:id", verifyToken, verifyTutor, async(req, res)=>{
+    app.patch("/create-session/pending/:id", verifyToken, verifyTutor, async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
 
       const updatedStatus = {
         $set: {
@@ -235,9 +237,9 @@ async function run() {
 
 
     // session status update to reject
-    app.patch("/create-session/reject/:id", verifyToken, verifyAdmin, async(req, res)=>{
+    app.patch("/create-session/reject/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
 
       const getInfo = req.body;
 
@@ -255,9 +257,9 @@ async function run() {
 
 
     // session status update to approve and the amount
-    app.patch("/create-session/approve/:id", verifyToken, verifyAdmin, async(req, res)=>{
+    app.patch("/create-session/approve/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
 
       const updatedStatus = req.body;
 
@@ -270,6 +272,24 @@ async function run() {
 
       const result = await createStudyCollection.updateOne(filter, newUpdatedStatus);
       res.send(result);
+    })
+
+
+
+    // Upload Materials related api
+
+    // get study materials
+    app.get("/study-material", verifyToken, async (req, res) => {
+      const result = await materialCollection.find().toArray();
+      res.send(result)
+    })
+
+
+    // upload materials
+    app.post("/study-material", verifyToken, verifyTutor, async (req, res) => {
+      const material = req.body;
+      const result = await materialCollection.insertOne(material);
+      res.send(result)
     })
 
 
