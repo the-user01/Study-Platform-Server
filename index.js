@@ -194,7 +194,7 @@ async function run() {
     })
 
     // getting data which are approved
-    app.get("/create-session/approved", verifyToken, async (req, res) => {
+    app.get("/create-session/approved",  async (req, res) => {
       const result = await createStudyCollection.find({ status: "approved" }).toArray();
       res.send(result)
     })
