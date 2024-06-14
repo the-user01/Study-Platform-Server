@@ -337,7 +337,7 @@ async function run() {
     // get booked session by id
     app.get("/booked-session/:id", verifyToken, verifyStudent, async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
+      const query = { _id: id }
 
       const result = await bookedSessionCollection.findOne(query);
       res.send(result)
