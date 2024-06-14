@@ -144,6 +144,15 @@ async function run() {
       res.send({ tutor })
     })
 
+
+    //get tutor api
+    app.get('/users/tutor', async (req, res) => {
+      const result = await usersCollection.find({role : "Teacher"}).toArray();
+      res.send(result)
+    })
+
+
+
     //get Student
     app.get('/users/student/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
@@ -328,10 +337,11 @@ async function run() {
     // get booked session by id
     app.get("/booked-session/:id", verifyToken, verifyStudent, async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
 
       const result = await bookedSessionCollection.findOne(query);
       res.send(result)
+
     })
 
     // booked session post
